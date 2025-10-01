@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Modal from '../ui/Modal.jsx';
 
 const sampleExperiences = [
@@ -78,7 +79,7 @@ export default function Landing() {
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight drop-shadow">Share and discover placement journeys</h1>
         <p className="mt-3 text-white/90 max-w-2xl">Real stories from seniors: interview rounds, OAs, tips, and resources — curated for students.</p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
-          <a href="/login" className="inline-flex items-center justify-center rounded-full bg-white text-slate-900 px-5 py-2.5 font-semibold shadow hover:shadow-md transition">Sign in with Google</a>
+          <Link to="/login" className="inline-flex items-center justify-center rounded-full bg-white text-slate-900 px-5 py-2.5 font-semibold shadow hover:shadow-md transition">Sign in with Google</Link>
           <a href="#samples" className="inline-flex items-center justify-center rounded-full bg-black/20 px-5 py-2.5 font-semibold backdrop-blur hover:bg-black/25 transition">Browse sample stories</a>
         </div>
       </section>
@@ -122,30 +123,34 @@ export default function Landing() {
 
       <Modal open={Boolean(active)} onClose={() => setActive(null)} title={active?.title || ''}>
         {active && (
-          <div className="space-y-3">
-            <div className="text-sm text-gray-600 dark:text-gray-300">{active.company} • {active.role} • {active.detail.year}</div>
-            <div>
-              <div className="font-medium">Online Assessment</div>
-              <p className="whitespace-pre-line text-gray-700 dark:text-gray-300">{active.detail.oa}</p>
-            </div>
+          <div className="prose prose-slate max-w-none">
+            <p className="m-0 text-sm text-gray-600 dark:text-gray-300">{active.company} • {active.role} • {active.detail.year}</p>
             {active.detail.rounds?.length > 0 && (
-              <div>
-                <div className="font-medium">Interview Rounds</div>
-                <div className="grid gap-2 mt-1">
+              <section>
+                <h3>Interview Rounds</h3>
+                <div className="grid gap-3">
                   {active.detail.rounds.map((r, i) => (
-                    <div key={i} className={`border rounded-lg p-3 ${i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'}`}>
-                      <div className="text-sm font-medium mb-1 text-gray-900 dark:text-gray-100">Round {i + 1}</div>
-                      <p className="text-sm m-0 text-gray-700 dark:text-gray-300">{r}</p>
+                    <div key={i} className={`${i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} border rounded-xl p-4`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="h-6 w-6 rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 flex items-center justify-center text-xs">{i + 1}</div>
+                        <div className="font-medium">Round {i + 1}</div>
+                      </div>
+                      <p className="m-0 whitespace-pre-line leading-7 text-gray-800 dark:text-gray-200">{r}</p>
                     </div>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
             {active.detail.tips && (
-              <div>
-                <div className="font-medium">Tips</div>
-                <p className="whitespace-pre-line text-gray-700 dark:text-gray-300">{active.detail.tips}</p>
-              </div>
+              <section>
+                <h3>Tips</h3>
+                <div className="border rounded-xl p-4 bg-amber-50 dark:bg-amber-900/20">
+                  <div className="flex items-start gap-2">
+                    <span className="mt-0.5">💡</span>
+                    <p className="m-0 whitespace-pre-line leading-7">{active.detail.tips}</p>
+                  </div>
+                </div>
+              </section>
             )}
           </div>
         )}
