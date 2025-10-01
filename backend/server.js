@@ -23,6 +23,12 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/auth', authRoutes);
 app.use('/experiences', experienceRoutes);
+// OAuth callback passthrough (optional if backend issues redirects)
+app.get('/auth/callback', (req, res) => {
+  // If backend receives Google OAuth redirect, forward to frontend route to handle token
+  const frontend = process.env.FRONTEND_URL || '/';
+  return res.redirect(frontend + '/auth/callback' + (req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''));
+});
 
 // Global error handler
 // eslint-disable-next-line no-unused-vars
@@ -37,9 +43,13 @@ const path = require('path');
 const clientBuildPath = path.join(__dirname, '..', 'frontend', 'dist');
 app.use(express.static(clientBuildPath));
 app.get('*', (req, res, next) => {
-  // Avoid intercepting API routes
-  if (req.path.startsWith('/auth') || req.path.startsWith('/experiences') || req.path.startsWith('/health')) return next();
-  res.sendFile(path.join(clientBuildPath, 'index.html'));
+  const accept = req.headers.accept || '';
+  // Serve SPA for browser navigations (refresh, direct link) expecting HTML
+  if (accept.includes('text/html')) {
+    return res.sendFile(path.join(clientBuildPath, 'index.html'));
+  }
+  // Otherwise let API/non-HTML requests fall through
+  return next();
 });
 
 const PORT = process.env.PORT || 10000;
